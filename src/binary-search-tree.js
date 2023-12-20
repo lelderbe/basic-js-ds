@@ -1,49 +1,139 @@
 const { NotImplementedError } = require('../extensions/index.js');
 
-// const { Node } = require('../extensions/list-tree.js');
+const { Node } = require('../extensions/list-tree.js');
 
 /**
-* Implement simple binary search tree according to task description
-* using Node from extensions
-*/
+ * Implement simple binary search tree according to task description
+ * using Node from extensions
+ */
 class BinarySearchTree {
+    constructor() {
+        this.head = null;
+    }
 
-  root() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
-  }
+    root() {
+        return this.head;
+    }
 
-  add(/* data */) {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
-  }
+    add(data) {
+        if (this.head === null) {
+            this.head = new Node(data);
+            return;
+        }
 
-  has(/* data */) {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
-  }
+        let current = this.head;
+        let prev = current;
+        while (current) {
+            prev = current;
+            if (data < current.data) {
+                current = current.left;
+            } else {
+                current = current.right;
+            }
+        }
+        if (data < prev.data) {
+            prev.left = new Node(data);
+        } else {
+            prev.right = new Node(data);
+        }
+    }
 
-  find(/* data */) {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
-  }
+    has(data) {
+        return this.find(data) !== null;
+    }
 
-  remove(/* data */) {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
-  }
+    find(data) {
+        let current = this.head;
+        while (current) {
+            if (current.data === data) {
+                return current;
+            }
+            if (data < current.data) {
+                current = current.left;
+            } else {
+                current = current.right;
+            }
+        }
+        return null;
+    }
 
-  min() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
-  }
+    remove(data) {
+        if (this.head && this.head.data === data) {
+            this.head = null;
+            return;
+        }
 
-  max() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
-  }
+        let current = this.head;
+        let prev = null;
+        while (current) {
+            if (current.data === data) {
+                break;
+            }
+            prev = current;
+            if (data < current.data) {
+                current = current.left;
+            } else {
+                current = current.right;
+            }
+        }
+        if (!current) {
+            return;
+        }
+        const prop = data < prev.data ? 'left' : 'right';
+        if (current.right === null && current.left === null) {
+            prev[prop] = null;
+            return;
+        }
+        if (current.right !== null && current.left !== null) {
+            prev[prop] = current.right;
+            let node = current.right;
+            while (node && node.left) {
+                node = node.left;
+            }
+            node.left = current.left;
+            return;
+        }
+        prev[prop] = current.left || current.right;
+    }
+
+    min() {
+        let current = this.head;
+        while (current && current.left) {
+            current = current.left;
+        }
+        if (!current) {
+            return null;
+        }
+        return current.data;
+    }
+
+    max() {
+        let current = this.head;
+        while (current && current.right) {
+            current = current.right;
+        }
+        if (!current) {
+            return null;
+        }
+        return current.data;
+    }
 }
 
 module.exports = {
-  BinarySearchTree
+    BinarySearchTree,
 };
+
+// const tree = new BinarySearchTree();
+
+// tree.add(20);
+// tree.add(5);
+// tree.add(12);
+// // tree.add(9);
+// tree.add(14);
+// tree.add(3);
+// tree.add(4);
+// tree.add(1);
+// console.log(tree.root());
+
+// tree.remove(5);
+// console.log(tree.root());
