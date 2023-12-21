@@ -31,11 +31,8 @@ class BinarySearchTree {
                 current = current.right;
             }
         }
-        if (data < prev.data) {
-            prev.left = new Node(data);
-        } else {
-            prev.right = new Node(data);
-        }
+        const prop = data < prev.data ? 'left' : 'right';
+        prev[prop] = new Node(data);
     }
 
     has(data) {
@@ -57,43 +54,44 @@ class BinarySearchTree {
         return null;
     }
 
-    remove(data) {
-        if (this.head && this.head.data === data) {
-            this.head = null;
-            return;
+    _remove(root, data) {
+        if (root === null) {
+            return null;
         }
 
-        let current = this.head;
-        let prev = null;
-        while (current) {
-            if (current.data === data) {
-                break;
-            }
-            prev = current;
-            if (data < current.data) {
-                current = current.left;
+        if (root.data === data) {
+            if (root.left === null && root.right === null) {
+                // scenario 1
+                return null;
+            } else if (root.left === null) {
+                // scenario 2
+                return root.right;
+            } else if (root.right === null) {
+                // scenario 3
+                return root.left;
             } else {
-                current = current.right;
+                // scenario 4
+                let current = root.right;
+                while (current.left !== null) {
+                    current = current.left;
+                }
+                let minRightSubtree = current; // minimum data from right subtree
+                root.data = minRightSubtree.data;
+                root.right = this._remove(root.right, minRightSubtree.data);
+            }
+        } else {
+            if (data < root.data) {
+                root.left = this._remove(root.left, data);
+            } else {
+                root.right = this._remove(root.right, data);
             }
         }
-        if (!current) {
-            return;
-        }
-        const prop = data < prev.data ? 'left' : 'right';
-        if (current.right === null && current.left === null) {
-            prev[prop] = null;
-            return;
-        }
-        if (current.right !== null && current.left !== null) {
-            prev[prop] = current.right;
-            let node = current.right;
-            while (node && node.left) {
-                node = node.left;
-            }
-            node.left = current.left;
-            return;
-        }
-        prev[prop] = current.left || current.right;
+
+        return root;
+    }
+
+    remove(data) {
+        this.head = this._remove(this.head, data);
     }
 
     min() {
@@ -127,13 +125,13 @@ module.exports = {
 
 // tree.add(20);
 // tree.add(5);
-// tree.add(12);
-// // tree.add(9);
-// tree.add(14);
-// tree.add(3);
-// tree.add(4);
-// tree.add(1);
+// tree.add(42);
+// // // tree.add(9);
+// // tree.add(14);
+// // tree.add(43);
+// // tree.add(4);
+// // tree.add(1);
 // console.log(tree.root());
 
-// tree.remove(5);
+// tree.remove(20);
 // console.log(tree.root());
